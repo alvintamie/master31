@@ -5,6 +5,7 @@ if (!process.env.token) {
 
 var Botkit = require('./lib/Botkit.js');
 var os = require('os');
+var solver = require('./solver31.js');
 
 var controller = Botkit.slackbot({
     debug: true,
@@ -35,6 +36,29 @@ controller.hears(['play'], 'direct_message,direct_mention,mention', function(bot
         console.log(questions);
         bot.reply(message, "Solve: "+ questions[0]+ " " + questions[1]+ " " + questions[2]+ " " + questions[3])
         }, 4000);
+});
+
+controller.hears(['solve: ([0-9\s ]*)'], 'direct_message,direct_mention,mention', function(bot, message) {
+    var problem_input = message.match[1];
+    bot.reply( message, 'Will solve: ' + problem_input);
+    var solution = solver.solve(problem_input, 31, ['+','-','*','/']);
+    bot.reply( message, 'Solution is: ' + solution);
+
+
+/*
+    var name = message.match[1];
+    controller.storage.users.get(message.user, function(err, user) {
+        if (!user) {
+            user = {
+                id: message.user,
+            };
+        }
+        user.name = name;
+        controller.storage.users.save(user, function(err, id) {
+            bot.reply(message, 'Got it. I will call you ' + user.name + ' from now on.');
+        });
+    });
+*/
 });
 
 controller.hears(['bonus-kucing'], 'direct_message,direct_mention,mention', function(bot, message) {
