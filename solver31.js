@@ -106,13 +106,17 @@ var getPermutations = function(choices, n){
 }
 
 var solve = function(input, target, ops){
-    var nums = input.trim().split(' ');
+    var clean_input = input.trim().replace(/\s\s+/g, ' ');
+    var nums = clean_input.trim().split(' ');
     if (typeof(ops) === 'undefined'){
         ops = ['+', '-', '*', '/', '>>', '<<']
     }
+    var old_ops = ops.slice();
 
     var n_num = nums.length;
     var n_op = n_num-1;
+    //Repeat the ops so that we can repeat same operation
+    for (var i=0; i < n_op-1; ++i) ops = ops.concat(old_ops);
 
     var tree_choices = generate_mock_tree(n_op);
     var ops_choices = getPermutations(ops, n_op);
