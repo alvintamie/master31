@@ -115,6 +115,7 @@ var solve = function(input, target, ops){
 
     var n_num = nums.length;
     var n_op = n_num-1;
+    //Repeat the ops so that we can repeat same operation
     for (var i=0; i < n_op-1; ++i) ops = ops.concat(old_ops);
 
     var tree_choices = generate_mock_tree(n_op);
