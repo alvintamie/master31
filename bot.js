@@ -50,6 +50,8 @@ controller.hears(['hint'], 'direct_message,direct_mention,mention', function(bot
             } else {
                 bot.reply(message, 'There is a solution')
             }
+        } else {
+            bot.reply(message, 'There are no numbers to solve.')
         }
     })
 })
