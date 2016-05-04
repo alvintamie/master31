@@ -45,6 +45,12 @@ controller.hears(['solve: ([0-9\s ]+)'], 'direct_message,direct_mention,mention'
     bot.reply( message, 'Solution is: ' + solution);
 });
 
+controller.hears(['solve_with_shift: ([0-9\s ]+)'], 'direct_message,direct_mention,mention', function(bot, message) {
+    var problem_input = message.match[1].trim();
+    bot.reply( message, 'Will solve: [' + problem_input + ']');
+    var solution = solver.solve(problem_input, 31, ['+','-','*','/', '**', '<<', '>>']);
+    bot.reply( message, 'Solution is: ' + solution);
+});
 
 controller.hears(['solve_with_target: ([0-9\s ]+), ([0-9]+)'], 'direct_message,direct_mention,mention', function(bot, message) {
     var problem_input = message.match[1].trim();
