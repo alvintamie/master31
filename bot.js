@@ -35,19 +35,36 @@ controller.hears(['play'], 'direct_message,direct_mention,mention', function(bot
         questions = generateQuestion();
         console.log(questions);
         console.log(message.channel)
-        controller.storage.channels.save({id: message.channel, questions:questions}, function(err){ console.log(err)});
+        controller.storage.channels.save({id: message.channel, questions:questions}, function(err){});
         bot.reply(message, "Solve: "+ questions[0]+ " " + questions[1]+ " " + questions[2]+ " " + questions[3])
         }, 4000);
 });
 
-controller.hears(['giveup'], 'direct_message,direct_mention,mention', function(bot, message) {
+controller.hears(['hint'], 'direct_message,direct_mention,mention', function(bot, message) {
     data = controller.storage.channels.get(message.channel, function(err, data){
-        console.log(data)
         if(data && data.questions) {
             var problem_input = data.questions.join(" ")
-            bot.reply( message, 'Will solve: [' + problem_input + ']');
             var solution = solver.solve(problem_input, 31, ['+','-','*','/', '**']);
+
+            if(solution == "NO SOLUTION") {
+                bot.reply(message, 'There are no solution. Please play again :)')
+                controller.storage.channels.save({id: message.channel, questions:null}, function(err){});
+            } else {
+                bot.reply(message, 'There is a solution')
+            }
+        }
+    })
+})
+
+controller.hears(['giveup'], 'direct_message,direct_mention,mention', function(bot, message) {
+    data = controller.storage.channels.get(message.channel, function(err, data){
+        if(data && data.questions) {
+            var problem_input = data.questions.join(" ")
+            var solution = solver.solve(problem_input, 31, ['+','-','*','/', '**']);
+
+            bot.reply( message, 'Will solve: [' + problem_input + ']');
             bot.reply( message, 'Solution is: ' + solution);
+            controller.storage.channels.save({id: message.channel, questions:null}, function(err){});
         } else {
             bot.reply(message, "There are no numbers to solve.")
         }
