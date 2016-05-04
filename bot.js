@@ -34,9 +34,25 @@ controller.hears(['play'], 'direct_message,direct_mention,mention', function(bot
     setTimeout(function(){
         questions = generateQuestion();
         console.log(questions);
+        console.log(message.channel)
+        controller.storage.channels.save({id: message.channel, questions:questions}, function(err){ console.log(err)});
         bot.reply(message, "Solve: "+ questions[0]+ " " + questions[1]+ " " + questions[2]+ " " + questions[3])
         }, 4000);
 });
+
+controller.hears(['giveup'], 'direct_message,direct_mention,mention', function(bot, message) {
+    data = controller.storage.channels.get(message.channel, function(err, data){
+        console.log(data)
+        if(data && data.questions) {
+            var problem_input = data.questions.join(" ")
+            bot.reply( message, 'Will solve: [' + problem_input + ']');
+            var solution = solver.solve(problem_input, 31, ['+','-','*','/', '**']);
+            bot.reply( message, 'Solution is: ' + solution);
+        } else {
+            bot.reply(message, "There are no numbers to solve.")
+        }
+    });
+})
 
 controller.hears(['solve: ([0-9\s ]+)'], 'direct_message,direct_mention,mention', function(bot, message) {
     var problem_input = message.match[1].trim();
@@ -45,34 +61,12 @@ controller.hears(['solve: ([0-9\s ]+)'], 'direct_message,direct_mention,mention'
     bot.reply( message, 'Solution is: ' + solution);
 });
 
-
 controller.hears(['solve_with_target: ([0-9\s ]+), ([0-9]+)'], 'direct_message,direct_mention,mention', function(bot, message) {
     var problem_input = message.match[1].trim();
     var target = parseInt(message.match[2].trim());
     bot.reply( message, 'May solve: [' + problem_input + '] with target: [' + target + ']');
     var solution = solver.solve(problem_input, target, ['+','-','*','/', '**']);
     bot.reply( message, 'Solution is: ' + solution);
-});
-
-
-controller.hears(['bonus-kucing'], 'direct_message,direct_mention,mention', function(bot, message) {
-    bot.api.reactions.add({
-        timestamp: message.ts,
-        channel: message.channel,
-        name: 'lebe-lebe-matabelo',
-    }, function(err, res) {
-        if (err) {
-            bot.botkit.log('Failed to add emoji reaction :(', err);
-        }
-    });
-
-    bot.reply(message, '.......Get ready in.......')
-    setTimeout(function(){ bot.reply(message, '...............3..............'); }, 1000);
-    setTimeout(function(){ bot.reply(message, '...............2..............'); }, 2000);
-    setTimeout(function(){ bot.reply(message, '...............1..............'); }, 3000);
-    setTimeout(function(){
-        bot.reply(message, "Solve: 3 Kucing bisa menangkap 3 Tikus dalam 3 Menit. Berapa kucing yang diperlukan untuk menangkap 100 Tikus dalam 100 menit?")
-        }, 4000);
 });
 
 controller.hears(['hello', 'hi'], 'direct_message,direct_mention,mention', function(bot, message) {
