@@ -33,8 +33,6 @@ controller.hears(['play'], 'direct_message,direct_mention,mention', function(bot
     setTimeout(function(){ bot.reply(message, '...............1..............'); }, 3000);
     setTimeout(function(){
         questions = generateQuestion();
-        console.log(questions);
-        console.log(message.channel)
         controller.storage.channels.save({id: message.channel, questions:questions}, function(err){});
         bot.reply(message, "Solve: "+ questions[0]+ " " + questions[1]+ " " + questions[2]+ " " + questions[3])
         }, 4000);
