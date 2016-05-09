@@ -44,7 +44,7 @@ controller.hears(['hint'], 'direct_message,direct_mention,mention', function(bot
             var problem_input = data.questions.join(" ")
             var solution = solver.solve(problem_input, 31, ['+','-','*','/', '**']);
 
-            if(solution == "NO SOLUTION") {
+            if(solution == "NO SOLUTION!") {
                 bot.reply(message, 'There are no solution. Please play again :)')
                 controller.storage.channels.save({id: message.channel, questions:null}, function(err){});
             } else {
