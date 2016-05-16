@@ -32,17 +32,28 @@ controller.hears(['play'], 'direct_message,direct_mention,mention', function(bot
     setTimeout(function(){ bot.reply(message, '...............2..............'); }, 2000);
     setTimeout(function(){ bot.reply(message, '...............1..............'); }, 3000);
     setTimeout(function(){
-        questions = generateQuestion();
-        controller.storage.channels.save({id: message.channel, questions:questions}, function(err){});
-        bot.reply(message, "Solve: "+ questions[0]+ " " + questions[1]+ " " + questions[2]+ " " + questions[3])
-        }, 4000);
+        controller.storage.channels.get(message.channel, function(err, data){
+            var targetNumber = 28;
+            if(data && data.targetNumber) {
+                console.log("CUPU")
+                targetNumber = data.targetNumber + 1;
+            }
+            if(targetNumber > 39) {
+                targetNumber = 28;
+            }
+            questions = generateQuestion();
+            controller.storage.channels.save({id: message.channel, questions:questions, targetNumber: targetNumber}, function(err){});
+            bot.reply(message, "Goal: "+ targetNumber);
+            bot.reply(message, "Solve: "+ questions[0]+ " " + questions[1]+ " " + questions[2]+ " " + questions[3])
+        })
+   }, 4000);
 });
 
 controller.hears(['hint'], 'direct_message,direct_mention,mention', function(bot, message) {
     data = controller.storage.channels.get(message.channel, function(err, data){
-        if(data && data.questions) {
+        if(data && data.questions && data.targetNumber) {
             var problem_input = data.questions.join(" ")
-            var solution = solver.solve(problem_input, 31, ['+','-','*','/', '**']);
+            var solution = solver.solve(problem_input, data.targetNumber, ['+','-','*','/', '**']);
 
             if(solution == "NO SOLUTION!") {
                 bot.reply(message, 'There are no solution. Please play again :)')
@@ -58,10 +69,11 @@ controller.hears(['hint'], 'direct_message,direct_mention,mention', function(bot
 
 controller.hears(['giveup'], 'direct_message,direct_mention,mention', function(bot, message) {
     data = controller.storage.channels.get(message.channel, function(err, data){
-        if(data && data.questions) {
+        if(data && data.questions && data.targetNumber) {
             var problem_input = data.questions.join(" ")
-            var solution = solver.solve(problem_input, 31, ['+','-','*','/', '**']);
+            var solution = solver.solve(problem_input, data.targetNumber, ['+','-','*','/', '**']);
 
+            bot.reply(message, "Goal: "+ data.targetNumber);
             bot.reply( message, 'Will solve: [' + problem_input + ']');
             bot.reply( message, 'Solution is: ' + solution);
             controller.storage.channels.save({id: message.channel, questions:null}, function(err){});
