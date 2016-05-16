@@ -76,7 +76,7 @@ controller.hears(['giveup'], 'direct_message,direct_mention,mention', function(b
             bot.reply(message, "Goal: "+ data.targetNumber);
             bot.reply( message, 'Will solve: [' + problem_input + ']');
             bot.reply( message, 'Solution is: ' + solution);
-            controller.storage.channels.save({id: message.channel, questions:null}, function(err){});
+            controller.storage.channels.save({id: message.channel, questions:null, targetNumber: data.targetNumber}, function(err){});
         } else {
             bot.reply(message, "There are no numbers to solve.")
         }
